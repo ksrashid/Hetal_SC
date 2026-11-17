@@ -30,13 +30,25 @@ def load_dataloader(data: str, model_checkpoint: str):
             Normalize(mean=mean, std=std),
         ]
     )
-    batch_size = 64
+    # temp change batch size to 16 originally 64
+    # batch_size = 64
+    batch_size = 16
     download = True
 
     if data == "mnist":
         train_dataset = torchvision.datasets.MNIST(data_dir, train=True, transform=transform, download=download)
         train_dataset, val_dataset = torch.utils.data.random_split(train_dataset, [0.875, 0.125], generator=torch.Generator().manual_seed(0))
         test_dataset = torchvision.datasets.MNIST(data_dir, train=False, transform=transform, download=download)
+
+
+        #TODO @KHALID MAKE IT CONFIGURABLE
+
+        # only use 1000 images
+        train_dataset = torch.utils.data.Subset(train_dataset, range(1000))
+        val_dataset = torch.utils.data.Subset(val_dataset, range(200))
+        test_dataset = torch.utils.data.Subset(test_dataset, range(200))
+
+
     elif data == "cifar10":
         train_dataset = torchvision.datasets.CIFAR10(data_dir, train=True, transform=transform, download=download)
         train_dataset, val_dataset = torch.utils.data.random_split(train_dataset, [0.875, 0.125], generator=torch.Generator().manual_seed(0))
